@@ -6,9 +6,12 @@ from sendgrid.helpers.mail import Email, Mail, Content, To
 from agents import Agent, function_tool, OpenAIChatCompletionsModel
 from openai import AsyncOpenAI
 from dotenv import load_dotenv
+
 load_dotenv(override=True)
-gemini_client = AsyncOpenAI(base_url=os.environ.get("GEMINI_BASE_URL"), api_key=os.environ.get("GOOGLE_API_KEY"))
-gemini_model = OpenAIChatCompletionsModel(model='gemini-2.5-flash', openai_client=gemini_client)
+# gemini_client = AsyncOpenAI(base_url=os.environ.get("GEMINI_BASE_URL"), api_key=os.environ.get("GOOGLE_API_KEY"))
+# gemini_model = OpenAIChatCompletionsModel(model='gemini-2.5-flash', openai_client=gemini_client)
+ollama_client = AsyncOpenAI(base_url='http://localhost:11434/v1', api_key='ollama')
+llama_model = OpenAIChatCompletionsModel(model='gemma3:12b', openai_client=ollama_client)
 
 @function_tool
 def send_email(subject: str, html_body: str) -> Dict[str, str]:
@@ -30,5 +33,5 @@ email_agent = Agent(
     name="Email agent",
     instructions=INSTRUCTIONS,
     tools=[send_email],
-    model=gemini_model,
+    model=llama_model,
 )
